@@ -29,6 +29,12 @@ body,p,label {
 	padding: 20px;
 }
 
+.gridStyle {
+	border: 1px solid rgb(212, 212, 212);
+	width: 760px;
+	height: 300px
+}
+
 table {
 	border-collapse: collapse;
 	width: 100%;
