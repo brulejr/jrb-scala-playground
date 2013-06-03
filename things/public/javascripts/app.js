@@ -13,7 +13,11 @@ appModule.controller('ThingCtrl', [ '$scope', 'ThingList',
 				}, {
 					field : 'name',
 					displayName : 'Name',
-					width : '200px'
+					width : '150px'
+				}, {
+					field : 'description',
+					displayName : 'Description',
+					width : '307px'
 				} ]
 			};
 

@@ -9,7 +9,7 @@ import play.api.libs.json.JsString
 import play.api.libs.json.JsValue
 import play.api.libs.json.Format
 
-case class Thing(id: Option[UUID] = None, name: String)
+case class Thing(id: Option[UUID] = None, name: String, description: Option[String] = None)
 
 object Thing {
 
@@ -26,8 +26,9 @@ object Thing {
   implicit val thingRead = Json.reads[Thing]
 
   var things = Set(
-    Thing(Some(UUID.randomUUID()), "Thing1"),
-    Thing(Some(UUID.randomUUID()), "Thing2"))
+    Thing(Some(UUID.randomUUID()), "Thing1", Option[String]("A thing of great import")),
+    Thing(Some(UUID.randomUUID()), "Thing2", Option[String]("Another thing")),
+    Thing(Some(UUID.randomUUID()), "Thing3", Option[String]("Junk, just pure junk")))
 
   def findAll = this.things.toList.sortBy(_.name)
 
@@ -36,10 +37,10 @@ object Thing {
   def findByName(name: String): Option[Thing] = this.things.find(_.name == name)
 
   def save(thing: Thing): Thing = {
-    this.things.find(_.id == thing.id).map{ oldThing =>
+    this.things.find(_.id == thing.id).map { oldThing =>
       this.things = this.things - oldThing + thing
       return thing
-    }.getOrElse{
+    }.getOrElse {
       val newThing = Thing(Some(UUID.randomUUID()), thing.name)
       this.things = this.things + newThing
       return newThing
