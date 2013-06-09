@@ -11,12 +11,12 @@ appModule.controller('ThingCtrl', [ '$scope', 'ThingList',
 					displayName : 'Name',
 					width : '150px'
 				}, {
-					field : 'description',
-					displayName : 'Description',
-					width : '290px'
-				}, {
 					field : 'location',
 					displayName : 'Location',
+					width : '290px'
+				}, {
+					field : 'lastSeenOn',
+					displayName : 'Last Seen',
 					width : '293px'
 				} ],
 				showFilter: true,
