@@ -48,4 +48,20 @@ object Things extends Controller with Thing.JSON {
     }
   }
 
+  def update(id: Long) = Action(parse.json) { implicit request =>
+    request.body.validate[Thing].map {
+      case thing => {
+        withTransaction { implicit session =>
+          thing.id = id
+          ThingDAO.update(thing) match {
+            case 0 => BadRequest("Unable to update thing")
+            case _ => Ok(Json.toJson(thing))
+          }
+        }
+      }
+    }.recoverTotal {
+      e => BadRequest("Detected error:" + JsError.toFlatJson(e))
+    }
+  }
+
 }
