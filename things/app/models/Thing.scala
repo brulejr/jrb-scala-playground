@@ -36,11 +36,13 @@ object Thing {
       Option(t.id), 
       t.name, 
       t.quantity, 
-      t.createdOn, 
-      t.lastUpdatedOn)
+      Option(t.createdOn), 
+      Option(t.lastUpdatedOn))
 
   trait JSON {
 
+    val dateWrites: Writes[Date] = Writes.dateWrites("yyyy-MM-dd'T'HH:mm:ss.SSS")
+    
     implicit val thingReads: Reads[Thing] = (
       (__ \ "id").readNullable[Long] and
       (__ \ "name").read[String] and
@@ -52,8 +54,8 @@ object Thing {
       (__ \ "id").writeNullable[Long] and
       (__ \ "name").write[String] and
       (__ \ "quantity").write[Int] and
-      (__ \ "createdOn").write[Date] and
-      (__ \ "lastUpdatedOn").write[Date])(unlift(Thing.unapply))
+      (__ \ "createdOn").writeNullable[Date](dateWrites) and
+      (__ \ "lastUpdatedOn").writeNullable[Date](dateWrites))(unlift(Thing.unapply))
 
     def parse(json: String) = Json.parse(json)
 
