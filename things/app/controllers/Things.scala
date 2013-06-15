@@ -1,50 +1,50 @@
 package controllers
 
-import play.api._
-import play.api.mvc._
 import models.Thing
-import play.api.libs.json.Json
-import java.util.UUID
+import persistence.PersistenceContext._
+import persistence.ThingDAO
+import play.api._
 import play.api.libs.json.JsError
+import play.api.libs.json.Json
+import play.api.mvc._
 
-object Things extends Controller {
-  
-  def create = Action(parse.json) { implicit request =>
-    request.body.validate[Thing].map{ 
-      case thing => {
-        Ok(Json.toJson(Thing.save(Thing(None, thing.name))))
-      }
-    }.recoverTotal{
-      e => BadRequest("Detected error:"+ JsError.toFlatJson(e))
+object Things extends Controller with Thing.JSON {
+
+  def list = Action { implicit request =>
+    withTransaction { implicit session =>
+      Ok(Json.toJson(ThingDAO.findAll()))
     }
   }
-  
-  def list = Action { implicit request =>
-    val things = Thing.findAll
-    Ok(Json.toJson(things))
-  }
 
-  def showById(id: UUID) = Action { implicit request =>
-    Thing.findById(id).map { thing =>
-      Ok(Json.toJson(thing))
-    }.getOrElse(NotFound)
-  }
-
-  def showByName(name: String) = Action { implicit request =>
-    Thing.findByName(name).map { thing =>
-      Ok(Json.toJson(thing))
-    }.getOrElse(NotFound)
-  }
-  
-  def update(id: UUID) = Action(parse.json) { implicit request =>
-    request.body.validate[Thing].map{ 
+  def create = Action(parse.json) { implicit request =>
+    request.body.validate[Thing].map {
       case thing => {
-    	Thing.findById(id).map { existingThing =>
-    		Ok(Json.toJson(Thing.save(Thing(Option[UUID](id), thing.name))))
-    	}.getOrElse(BadRequest("Unknown thing"))
+        withTransaction { implicit session =>
+          ThingDAO insert thing
+          Ok(Json.toJson(thing))
+        }
       }
-    }.recoverTotal{
-      e => BadRequest("Detected error:"+ JsError.toFlatJson(e))
+    }.recoverTotal {
+      e => BadRequest("Detected error:" + JsError.toFlatJson(e))
+    }
+  }
+
+  def deleteById(id: Long) = Action { implicit request =>
+    withTransaction { implicit session =>
+      ThingDAO.deleteById(id) match {
+        case 0 => NotFound
+        case _ => Ok(Json.toJson("SUCCESS"))
+      }
+
+    }
+  }
+
+  def findById(id: Long) = Action { implicit request =>
+    withTransaction { implicit session =>
+      ThingDAO.findById(id) match {
+        case Some(thing: Thing) => Ok(Json.toJson(thing))
+        case _ => NotFound
+      }
     }
   }
 

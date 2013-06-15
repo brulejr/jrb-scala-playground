@@ -8,9 +8,10 @@ object ApplicationBuild extends Build {
   val appVersion      = "1.0-SNAPSHOT"
 
   val appDependencies = Seq(
-    // Add your project dependencies here,
     jdbc,
-    anorm
+    anorm,
+    "org.specs2" %% "specs2" % "1.12.3" % "test" withSources() withJavadoc(),
+    "org.mybatis.scala" %% "mybatis-scala-core" % "1.0.1" withSources() withJavadoc()
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(

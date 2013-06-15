@@ -1,59 +1,43 @@
 package models
 
-import java.util.UUID
-import play.api.libs.json.Json
-import play.api.libs.json.JsSuccess
-import play.api.libs.json.JsError
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsString
-import play.api.libs.json.JsValue
-import play.api.libs.json.Format
 import java.util.Date
+import java.util.UUID
 
-case class Thing(
-  id: Option[UUID] = None,
-  name: String,
-  description: Option[String] = None,
-  location: Option[String] = None,
-  quantity: Int = 1,
-  createdOn: Date = new Date(),
-  lastUpdatedOn: Date = new Date())
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+
+class Thing {
+  var id: Long = _
+  var name: String = _
+  var quantity: Int = _
+}
 
 object Thing {
 
-  implicit object UUIDFormat extends Format[UUID] {
-    def writes(uuid: UUID): JsValue = JsString(uuid.toString())
-    def reads(json: JsValue): JsResult[UUID] = json match {
-      case JsString(x) => JsSuccess(UUID.fromString(x))
-      case _ => JsError("Expected UUID as JsString")
-    }
+  def apply(id: Option[Long], name: String, quantity: Int) = {
+    val t = new Thing
+    t.id = id.getOrElse(-1)
+    t.name = name
+    t.quantity = quantity
+    t
   }
 
-  implicit val thingWrite = Json.writes[Thing]
+  def unapply(t: Thing) = Some((Option(t.id), t.name, t.quantity))
 
-  implicit val thingRead = Json.reads[Thing]
+  trait JSON {
 
-  var things = Set(
-    Thing(Some(UUID.randomUUID()), "Thing1", Option[String]("A thing of great import"), Option[String]("Kitchen")),
-    Thing(Some(UUID.randomUUID()), "Thing2", Option[String]("Another thing"), Option[String]("Kitchen"), 2),
-    Thing(Some(UUID.randomUUID()), "Thing3", Option[String]("Junk, just pure junk"), Option[String]("Basement")),
-    Thing(Some(UUID.randomUUID()), "Thing4", Option[String]("Junk, just pure junk"), Option[String]("Basement"), 3))
+    implicit val thingReads: Reads[Thing] = (
+      (__ \ "id").readNullable[Long] and
+      (__ \ "name").read[String] and
+      (__ \ "quantity").read[Int])(Thing.apply _)
 
-  def findAll = this.things.toList.sortBy(_.name)
+    implicit val thingWrites: Writes[Thing] = (
+      (__ \ "id").writeNullable[Long] and
+      (__ \ "name").write[String] and
+      (__ \ "quantity").write[Int])(unlift(Thing.unapply))
 
-  def findById(id: UUID): Option[Thing] = this.things.find(_.id == Option[UUID](id))
+    def parse(json: String) = Json.parse(json)
 
-  def findByName(name: String): Option[Thing] = this.things.find(_.name == name)
-
-  def save(thing: Thing): Thing = {
-    this.things.find(_.id == thing.id).map { oldThing =>
-      this.things = this.things - oldThing + thing
-      return thing
-    }.getOrElse {
-      val newThing = Thing(Some(UUID.randomUUID()), thing.name)
-      this.things = this.things + newThing
-      return newThing
-    }
   }
 
 }
