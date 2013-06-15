@@ -55,7 +55,7 @@ object Things extends Controller with Thing.JSON {
           thing.id = id
           ThingDAO.update(thing) match {
             case 0 => BadRequest("Unable to update thing")
-            case _ => Ok(Json.toJson(thing))
+            case _ => Ok(Json.toJson(ThingDAO.findById(thing.id)))
           }
         }
       }
