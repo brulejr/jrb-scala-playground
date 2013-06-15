@@ -4,6 +4,8 @@ import org.mybatis.scala.mapping._
 import org.mybatis.scala.mapping.Binding._
 import org.mybatis.scala.mapping.TypeHandlers._
 import models.Thing
+import java.util.Date
+import org.mybatis.scala.session.Session
 
 object ThingDAO {
 
@@ -11,6 +13,8 @@ object ThingDAO {
     id(column = "id", property = "id")
     result(column = "name", property = "name")
     result(column = "quantity", property = "quantity", jdbcType = JdbcType.INTEGER)
+    result(column = "created_on", property = "createdOn", jdbcType = JdbcType.TIMESTAMP)
+    result(column = "last_updated_on", property = "lastUpdatedOn", jdbcType = JdbcType.TIMESTAMP)
   }
 
   val SELECT_SQL =
@@ -61,12 +65,20 @@ object ThingDAO {
     keyGenerator = JdbcGeneratedKey(null, "id")
     def xsql =
       <xsql>
-        INSERT INTO thing(name, quantity)
+        INSERT INTO thing(name, quantity, created_on, last_updated_on)
         VALUES (
         	{ "name"? },
-        	{ ?("quantity", jdbcType = JdbcType.INTEGER) }
+        	{ ?("quantity", jdbcType = JdbcType.INTEGER) },
+        	{ ?("createdOn", jdbcType = JdbcType.TIMESTAMP) },
+        	{ ?("lastUpdatedOn", jdbcType = JdbcType.TIMESTAMP) }
         )
       </xsql>
+
+    override def apply(thing: Thing)(implicit s: Session): Int = {
+      thing.createdOn = new Date()
+      thing.lastUpdatedOn = new Date()
+      super.apply(thing)
+    }
   }
 
   val update = new Update[Thing] {
@@ -75,9 +87,15 @@ object ThingDAO {
         UPDATE thing
         SET 
           name = { "name"? },
-          quantity = { ?("quantity", jdbcType = JdbcType.INTEGER) }
-        WHERE id ={ "id"? }
+          quantity = { ?("quantity", jdbcType = JdbcType.INTEGER) },
+          last_updated_on = { ?("lastUpdatedOn", jdbcType = JdbcType.TIMESTAMP) }
+        WHERE id = { "id"? }
       </xsql>
+
+    override def apply(thing: Thing)(implicit s: Session): Int = {
+      thing.lastUpdatedOn = new Date()
+      super.apply(thing)
+    }
   }
 
   def bind = Seq(delete, deleteById, findById, findByName, findAll, insert, update)

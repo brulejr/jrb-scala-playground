@@ -8,7 +8,8 @@ CREATE TABLE thing (
     id integer NOT NULL DEFAULT nextval('thing_id_seq'),
     name varchar(64) not null,
     quantity int not null,
-    description varchar(1024),
+    created_on timestamp default CURRENT_TIMESTAMP,
+    last_updated_on timestamp default CURRENT_TIMESTAMP,
     primary key (id)
 );
 -- CREATE TABLE thing (
