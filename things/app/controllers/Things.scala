@@ -21,7 +21,8 @@ object Things extends Controller with Thing.JSON {
       case thing => {
         withTransaction { implicit session =>
           ThingDAO insert thing
-          Ok(Json.toJson(thing))
+          Ok(Json.toJson(thing)).withHeaders(
+              LOCATION -> routes.Things.findById(thing.id).absoluteURL(false))
         }
       }
     }.recoverTotal {
