@@ -21,6 +21,9 @@ object PersistenceContext {
   config.addSpace("thing") { space =>
     space ++= ThingDAO
   }
+  config.addSpace("tag") { space =>
+    space ++= TagDAO
+  }
 
   //== Init mybatis context ==//
   val mybatis = config.createPersistenceContext

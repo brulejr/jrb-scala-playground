@@ -5,12 +5,17 @@
 # Home page
 GET		/					controllers.Application.index
 
+# Tags
+GET		/api/tags			controllers.Tags.list
+GET		/api/tag/:id		controllers.Tags.findById(id: Long)
+POST	/api/tag			controllers.Tags.create
+PUT		/api/tag/:id		controllers.Tags.update(id: Long)
+DELETE	/api/tag/:id		controllers.Tags.deleteById(id: Long)
+
 # Things
 GET		/api/things			controllers.Things.list
-#GET		/api/thing/$id<[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}>	controllers.Things.showById(id: java.util.UUID)
 GET		/api/thing/:id		controllers.Things.findById(id: Long)
 POST	/api/thing			controllers.Things.create
-#PUT		/api/thing/$id<[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}>	controllers.Things.update(id: java.util.UUID)
 PUT		/api/thing/:id		controllers.Things.update(id: Long)
 DELETE	/api/thing/:id		controllers.Things.deleteById(id: Long)
 
