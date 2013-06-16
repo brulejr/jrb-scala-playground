@@ -15,6 +15,7 @@ object ThingDAO {
     result(column = "quantity", property = "quantity", jdbcType = JdbcType.INTEGER)
     result(column = "description", property = "description")
     result(column = "location", property = "location")
+    result(column = "last_seen_on", property = "lastSeenOn", jdbcType = JdbcType.TIMESTAMP)
     result(column = "created_on", property = "createdOn", jdbcType = JdbcType.TIMESTAMP)
     result(column = "last_updated_on", property = "lastUpdatedOn", jdbcType = JdbcType.TIMESTAMP)
   }
@@ -67,12 +68,13 @@ object ThingDAO {
     keyGenerator = JdbcGeneratedKey(null, "id")
     def xsql =
       <xsql>
-        INSERT INTO thing(name, quantity, description, location, created_on, last_updated_on)
+        INSERT INTO thing(name, quantity, description, location, last_seen_on, created_on, last_updated_on)
         VALUES (
         	{ "name"? },
         	{ ?("quantity", jdbcType = JdbcType.INTEGER) },
         	{ ?("description", jdbcType = JdbcType.VARCHAR) },
         	{ ?("location", jdbcType = JdbcType.VARCHAR) },
+        	{ ?("lastSeenOn", jdbcType = JdbcType.TIMESTAMP) },
         	{ ?("createdOn", jdbcType = JdbcType.TIMESTAMP) },
         	{ ?("lastUpdatedOn", jdbcType = JdbcType.TIMESTAMP) }
         )
@@ -92,6 +94,7 @@ object ThingDAO {
         SET 
           name = { "name"? },
           quantity = { ?("quantity", jdbcType = JdbcType.INTEGER) },
+          last_seen_on = { ?("lastSeenOn", jdbcType = JdbcType.TIMESTAMP) }
           last_updated_on = { ?("lastUpdatedOn", jdbcType = JdbcType.TIMESTAMP) }
         WHERE id = { "id"? }
       </xsql>

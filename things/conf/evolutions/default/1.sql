@@ -10,6 +10,7 @@ CREATE TABLE thing (
     quantity int not null,
     description varchar(1024),
     location varchar(64),
+    last_seen_on timestamp,
     created_on timestamp default CURRENT_TIMESTAMP,
     last_updated_on timestamp default CURRENT_TIMESTAMP,
     primary key (id)

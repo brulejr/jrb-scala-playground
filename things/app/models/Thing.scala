@@ -12,6 +12,7 @@ class Thing {
   var quantity: Int = _
   var description: String = _
   var location: String = _
+  var lastSeenOn: Date = _
   var createdOn: Date = _
   var lastUpdatedOn: Date = _
 }
@@ -24,6 +25,7 @@ object Thing {
     quantity: Int,
     description: Option[String],
     location: Option[String],
+    lastSeenOn: Option[Date],
     createdOn: Option[Date],
     lastUpdatedOn: Option[Date]) = {
     
@@ -33,6 +35,7 @@ object Thing {
     t.quantity = quantity
     t.description = description.getOrElse(null)
     t.location = location.getOrElse(null)
+    t.lastSeenOn = lastSeenOn.getOrElse(null)
     t.createdOn = createdOn.getOrElse(null)
     t.lastUpdatedOn = lastUpdatedOn.getOrElse(null)
     t
@@ -44,12 +47,14 @@ object Thing {
       t.quantity,
       Option(t.description),
       Option(t.location),
+      Option(t.lastSeenOn), 
       Option(t.createdOn), 
       Option(t.lastUpdatedOn))
 
   trait JSON {
 
-    val dateWrites: Writes[Date] = Writes.dateWrites("yyyy-MM-dd'T'HH:mm:ss.SSS")
+    val dateWrites: Writes[Date] = Writes.dateWrites("yyyy-MM-dd")
+    val timestampWrites: Writes[Date] = Writes.dateWrites("yyyy-MM-dd'T'HH:mm:ss.SSS")
     
     implicit val thingReads: Reads[Thing] = (
       (__ \ "id").readNullable[Long] and
@@ -57,6 +62,7 @@ object Thing {
       (__ \ "quantity").read[Int] and
       (__ \ "description").readNullable[String] and
       (__ \ "location").readNullable[String] and
+      (__ \ "lastSeenOn").readNullable[Date] and
       (__ \ "createdOn").readNullable[Date] and
       (__ \ "lastUpdatedOn").readNullable[Date])(Thing.apply _)
 
@@ -66,8 +72,9 @@ object Thing {
       (__ \ "quantity").write[Int] and
       (__ \ "description").writeNullable[String] and
       (__ \ "location").writeNullable[String] and
-      (__ \ "createdOn").writeNullable[Date](dateWrites) and
-      (__ \ "lastUpdatedOn").writeNullable[Date](dateWrites))(unlift(Thing.unapply))
+      (__ \ "lastSeenOn").writeNullable[Date](dateWrites) and
+      (__ \ "createdOn").writeNullable[Date](timestampWrites) and
+      (__ \ "lastUpdatedOn").writeNullable[Date](timestampWrites))(unlift(Thing.unapply))
 
     def parse(json: String) = Json.parse(json)
 
