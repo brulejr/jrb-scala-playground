@@ -10,6 +10,8 @@ class Thing {
   var id: Long = _
   var name: String = _
   var quantity: Int = _
+  var description: String = _
+  var location: String = _
   var createdOn: Date = _
   var lastUpdatedOn: Date = _
 }
@@ -20,6 +22,8 @@ object Thing {
     id: Option[Long],
     name: String,
     quantity: Int,
+    description: Option[String],
+    location: Option[String],
     createdOn: Option[Date],
     lastUpdatedOn: Option[Date]) = {
     
@@ -27,6 +31,8 @@ object Thing {
     t.id = id.getOrElse(-1)
     t.name = name
     t.quantity = quantity
+    t.description = description.getOrElse(null)
+    t.location = location.getOrElse(null)
     t.createdOn = createdOn.getOrElse(null)
     t.lastUpdatedOn = lastUpdatedOn.getOrElse(null)
     t
@@ -35,7 +41,9 @@ object Thing {
   def unapply(t: Thing) = Some(
       Option(t.id), 
       t.name, 
-      t.quantity, 
+      t.quantity,
+      Option(t.description),
+      Option(t.location),
       Option(t.createdOn), 
       Option(t.lastUpdatedOn))
 
@@ -47,6 +55,8 @@ object Thing {
       (__ \ "id").readNullable[Long] and
       (__ \ "name").read[String] and
       (__ \ "quantity").read[Int] and
+      (__ \ "description").readNullable[String] and
+      (__ \ "location").readNullable[String] and
       (__ \ "createdOn").readNullable[Date] and
       (__ \ "lastUpdatedOn").readNullable[Date])(Thing.apply _)
 
@@ -54,6 +64,8 @@ object Thing {
       (__ \ "id").writeNullable[Long] and
       (__ \ "name").write[String] and
       (__ \ "quantity").write[Int] and
+      (__ \ "description").writeNullable[String] and
+      (__ \ "location").writeNullable[String] and
       (__ \ "createdOn").writeNullable[Date](dateWrites) and
       (__ \ "lastUpdatedOn").writeNullable[Date](dateWrites))(unlift(Thing.unapply))
 

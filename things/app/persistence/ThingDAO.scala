@@ -13,6 +13,8 @@ object ThingDAO {
     id(column = "id", property = "id")
     result(column = "name", property = "name")
     result(column = "quantity", property = "quantity", jdbcType = JdbcType.INTEGER)
+    result(column = "description", property = "description")
+    result(column = "location", property = "location")
     result(column = "created_on", property = "createdOn", jdbcType = JdbcType.TIMESTAMP)
     result(column = "last_updated_on", property = "lastUpdatedOn", jdbcType = JdbcType.TIMESTAMP)
   }
@@ -65,10 +67,12 @@ object ThingDAO {
     keyGenerator = JdbcGeneratedKey(null, "id")
     def xsql =
       <xsql>
-        INSERT INTO thing(name, quantity, created_on, last_updated_on)
+        INSERT INTO thing(name, quantity, description, location, created_on, last_updated_on)
         VALUES (
         	{ "name"? },
         	{ ?("quantity", jdbcType = JdbcType.INTEGER) },
+        	{ ?("description", jdbcType = JdbcType.VARCHAR) },
+        	{ ?("location", jdbcType = JdbcType.VARCHAR) },
         	{ ?("createdOn", jdbcType = JdbcType.TIMESTAMP) },
         	{ ?("lastUpdatedOn", jdbcType = JdbcType.TIMESTAMP) }
         )
